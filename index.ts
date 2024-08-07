@@ -51,7 +51,7 @@ app.post('/fetch-live-data/mlb', async (req, res) => {
 });
 
 app.get('/fetch-api-data', async (req, res) => {
-    console.log('GET /fetchApiData route hit');
+    console.log('GET /fetch-api-data route hit');
     try {
         const { startTime, endTime } = req.query;
         console.log('Received query parameters:', { startTime, endTime });
