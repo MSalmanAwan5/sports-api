@@ -50,7 +50,7 @@ app.post('/fetch-live-data/mlb', async (req, res) => {
     }
 });
 
-app.get('/fetchApiData', async (req, res) => {
+app.get('/fetch-api-data', async (req, res) => {
     console.log('GET /fetchApiData route hit');
     try {
         const { startTime, endTime } = req.query;
