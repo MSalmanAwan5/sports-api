@@ -36,16 +36,12 @@ app.post('/fetch-live-data/mlb', async (req, res) => {
 
         return res.json(apiResponse.data);
     } catch (error) {
-		// console.log("hit error");
         const errorRecord = new ApiData({
 			request: req.body || { date: "now" },
             response: { error: (error as any).message }
         });
-		// console.log(errorRecord)
         await errorRecord.save();
-		// console.log(errorRecord, req.body);
-        // console.error('Error fetching data:', (error as any).message);
-        await errorRecord.save();
+		console.error("Error fetching data:", (error as any).message);
         res.status(200).json({ error }).send();
     }
 });
