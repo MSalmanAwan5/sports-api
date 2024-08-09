@@ -8,8 +8,8 @@ const port = 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
-
 //DB Connection
+/** */
 mongoose.connect(`${process.env.DATABASEURL}`, {
 }).then(() => {
 	console.log('Connected to MongoDB');
@@ -54,16 +54,53 @@ app.get('/fetch-api-data', async (req, res) => {
 
         const query: any = {};
         if (startTime && endTime) {
-            query.createdAt = {};
-            query.createdAt.$gte = new Date(startTime as string);
-            query.createdAt.$lte = new Date(endTime as string);
+            query.request.date = {};
+            query.request.date.$gte = new Date(startTime as string);
+            query.request.date.$lte = new Date(endTime as string);
         }
         console.log('Constructed query:', query);
 
         const results = await ApiData.find(query);
-        console.log('Query results:', results);
 
-        res.json(results);
+        const formattedResults: { [key: string]: any[] } = {};
+        results.forEach((result) => {
+            if(result?.response?.error){
+                return;
+            }
+            const date = result?.request?.date;
+            if (!formattedResults[date]) {
+                formattedResults[date] = [];
+            }
+            formattedResults[date].push(result);
+        });
+        res.json(formattedResults);
+    } catch (error) {
+        console.error('Error fetching data:', (error as any).message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/', async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+        
+        if (!startDate || !endDate) {
+            return res.status(400).json({ error: 'Missing required query parameters' });
+        }
+        const apiUrl = `${process.env.BASE_URL}/fetch-api-data`
+        const apiResponse = await axios.get(apiUrl);
+        
+        const filteredData = Object.keys(apiResponse.data)
+            .filter(date => {
+                const currentDate = new Date(date);
+                return currentDate >= new Date(startDate as string) && currentDate <= new Date(endDate as string);
+            })
+            .reduce((obj: any, key : string) => {
+                obj[key] = apiResponse.data[key];
+                return obj;
+            }, {});
+        
+        res.json(filteredData);
     } catch (error) {
         console.error('Error fetching data:', (error as any).message);
         res.status(500).json({ error: 'Internal Server Error' });
