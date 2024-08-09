@@ -1,21 +1,23 @@
 import express from 'express';
 import axios from 'axios';
-import mongoose from 'mongoose';
 import ApiData from './schema';
+import { authMiddleware } from './lib/authMiddleware';
+import mongoose from 'mongoose';
+
 
 const app = express();
 const port = 3000;
 
-// Middleware to parse JSON bodies
-app.use(express.json());
-//DB Connection
-/** */
 mongoose.connect(`${process.env.DATABASEURL}`, {
 }).then(() => {
 	console.log('Connected to MongoDB');
 }).catch(err => {
 	console.error('Error connecting to MongoDB:', err.message);
 });
+
+
+// Middleware to parse JSON bodies
+app.use(express.json());
 
 // POST route handler
 app.post('/fetch-live-data/mlb', async (req, res) => {
@@ -46,7 +48,7 @@ app.post('/fetch-live-data/mlb', async (req, res) => {
     }
 });
 
-app.get('/fetch-api-data', async (req, res) => {
+app.get('/fetch-api-data', authMiddleware, async (req, res) => {
     console.log('GET /fetch-api-data route hit');
     try {
         const { startTime, endTime } = req.query;
@@ -80,7 +82,7 @@ app.get('/fetch-api-data', async (req, res) => {
     }
 });
 
-app.get('/', async (req, res) => {
+app.get('/', authMiddleware, async (req, res) => {
     try {
         const { startDate, endDate } = req.query;
         
