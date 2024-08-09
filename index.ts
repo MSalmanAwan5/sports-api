@@ -90,8 +90,11 @@ app.get('/', authMiddleware, async (req, res) => {
             return res.status(400).json({ error: 'Missing required query parameters' });
         }
         const apiUrl = `${process.env.BASE_URL}/fetch-api-data`
-        const apiResponse = await axios.get(apiUrl);
-        
+        const apiResponse = await axios.get(apiUrl, {
+            headers: {
+                'x-api-key': process.env.AUTH_KEY
+            }
+        });        
         const filteredData = Object.keys(apiResponse.data)
             .filter(date => {
                 const currentDate = new Date(date);
