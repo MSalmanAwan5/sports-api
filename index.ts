@@ -19,7 +19,7 @@ mongoose.connect(`${process.env.DATABASEURL}`, {
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-app.get('fetch-live-data/mlb', async (req, res) => {
+app.get('/fetch-live-data/mlb', async (req, res) => {
 	try {
 		const apiUrl = `https://rest.datafeeds.rolling-insights.com/api/v1/live/now/MLB?RSC_token=${process.env.RSC_TOKEN}`;
 		const apiResponse = await axios.get(apiUrl);
